@@ -1,16 +1,16 @@
 <template>
-<!--  Отслеживает в какую колонку передана задача-->
+  <!--  Отслеживает в какую колонку передана задача-->
   <app-drop
       class="column"
       @drop="moveTask"
   >
     <h2 class="column__name">
-<!--      Показывает наименование колонки-->
+      <!--      Показывает наименование колонки-->
       <span v-if="!state.isInputShowed">
         {{ state.columnTitle }}
       </span>
 
-<!--      Показывает инпут если колонка редактируется-->
+      <!--      Показывает инпут если колонка редактируется-->
       <input
           v-else
           ref="columnTitle"
@@ -21,14 +21,14 @@
           @blur="updateInput"
       />
 
-<!--      Показывает иконку редактирования задачи-->
+      <!--      Показывает иконку редактирования задачи-->
       <app-icon
           v-if="!state.isInputShowed"
           class="icon--edit"
           @click="showInput"
       />
-<!--      Показывает иконку удаления колонки-->
-<!--      Иконка не будет отображаться если в колонке есть задачи-->
+      <!--      Показывает иконку удаления колонки-->
+      <!--      Иконка не будет отображаться если в колонке есть задачи-->
       <app-icon
           v-if="!state.isInputShowed && !columnTasks.length"
           class="icon--trash"
@@ -37,14 +37,19 @@
     </h2>
 
     <div class="column__target-area">
-<!--      Вынесли задачи в отдельный компонент-->
-      <task-card
-          v-for="task in columnTasks"
-          :key="task.id"
-          :task="task"
-          class="column__task"
-          @drop="moveTask($event, task)"
-      />
+      <!--      Вынесли задачи в отдельный компонент-->
+      <transition-group name="tasks">
+        <div
+            v-for="task in columnTasks"
+            :key="task.id"
+        >
+          <task-card
+              :task="task"
+              class="column__task"
+              @drop="moveTask($event, task)"
+          />
+        </div>
+      </transition-group>
     </div>
   </app-drop>
 </template>
@@ -72,8 +77,8 @@ const emits = defineEmits(['update', 'delete'])
 // Фильтруем задачи, которые относятся к конкретной колонке
 const columnTasks = computed(() => {
   return tasksStore.filteredTasks
-    .filter(task => task.columnId === props.column.id)
-    .sort((a, b) => a.sortOrder - b.sortOrder)
+      .filter(task => task.columnId === props.column.id)
+      .sort((a, b) => a.sortOrder - b.sortOrder)
 })
 
 // Показывает инпут для редактирования колонки и наводим фокус
@@ -124,6 +129,7 @@ function moveTask (active, toTask) {
 
 <style lang="scss" scoped>
 @import "@/assets/scss/app.scss";
+
 .column {
   display: flex;
   flex-direction: column;
@@ -200,5 +206,17 @@ function moveTask (active, toTask) {
     margin-right: 5px;
     margin-left: 5px;
   }
+}
+
+.tasks-enter-active,
+.tasks-leave-active {
+  transition: all $animationSpeed ease;
+}
+
+.tasks-enter,
+.tasks-leave-to {
+  transform: scale(1.1);
+
+  opacity: 0;
 }
 </style>

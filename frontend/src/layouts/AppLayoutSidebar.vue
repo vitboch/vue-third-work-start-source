@@ -35,13 +35,18 @@
 
           <div class="backlog__target-area">
             <!--  Задачи в беклоге-->
-            <task-card
-                v-for="task in tasksStore.sidebarTasks"
-                :key="task.id"
-                :task="task"
-                class="backlog__task"
-                @drop="moveTask($event, task)"
-            />
+            <transition-group name="tasks">
+              <div
+                  v-for="task in tasksStore.sidebarTasks"
+                  :key="task.id"
+              >
+                <task-card
+                    :task="task"
+                    class="backlog__task"
+                    @drop="moveTask($event, task)"
+                />
+              </div>
+            </transition-group>
           </div>
         </div>
       </div>
@@ -260,5 +265,17 @@ function moveTask (active, toTask) {
     margin-bottom: 11px;
     margin-left: 12px;
   }
+}
+
+.tasks-enter-active,
+.tasks-leave-active {
+  transition: all $animationSpeed ease;
+}
+
+.tasks-enter,
+.tasks-leave-to {
+  transform: scale(1.1);
+
+  opacity: 0;
 }
 </style>
